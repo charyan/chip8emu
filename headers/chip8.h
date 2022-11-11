@@ -35,6 +35,7 @@ public:
     chip8(frontend* _F);
     ~chip8();
     void tick();
+    void timerTick();
     void load(std::string filename);
 };
 

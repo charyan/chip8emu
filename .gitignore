@@ -1,0 +1,5 @@
+*.ch8
+*.ttf
+main
+.vscode/*
+*.txt

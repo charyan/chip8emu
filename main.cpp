@@ -26,11 +26,14 @@ int main(int argc, char* args[])
     fr.setColor(0);
    
     fr.update();
-    c.load("danm8ku.ch8");
+    c.load("octojam2title.ch8");
 
     SDL_Event e;
-    uint64_t t0 = 0;
-    uint64_t t1 = 1000;
+    uint64_t tickTime = 0;
+    uint64_t lastTime = 1000;
+
+    // Time used for timers in ms
+    uint64_t timerTime = 0;
 
     bool pause = false;
 
@@ -47,12 +50,17 @@ int main(int argc, char* args[])
         }
         
         if(!pause){
-            if(t1-t0 >= 10){
+            if(lastTime-timerTime >= (1000/60)){
+                c.timerTick();
+                timerTime = lastTime;
+            }
+
+            if(lastTime-tickTime >= 1){
                 c.tick();
-                t0 = t1;
+                tickTime = lastTime;
             }
             
-            t1 = SDL_GetTicks64();
+            lastTime = SDL_GetTicks64();
         }
     }
 

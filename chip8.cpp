@@ -59,9 +59,6 @@ chip8::~chip8()
 void chip8::tick(){
     F->debug(getDebugText());  
 
-    delayTimer--;
-    soundTimer--;
-
     uint16_t ins = fetch();
 
     if(lastTenInstructions.size()<10){
@@ -74,7 +71,17 @@ void chip8::tick(){
     }
 
     decode(ins);
-}    
+}
+
+void chip8::timerTick(){
+    if(delayTimer != 0){
+        delayTimer--;
+    }
+
+    if(soundTimer != 0){
+        soundTimer--;
+    }
+}
 
 
 std::string chip8::hexString(uint32_t n, uint32_t width){
@@ -183,6 +190,7 @@ void chip8::decode(uint16_t _instruct){
     case 0x00EE:
         PC = stack.top();
         stack.pop();
+        
         break;
     // 1NNN (jump)
     case 0x1000 ... 0x1FFF:
@@ -317,7 +325,9 @@ void chip8::decode(uint16_t _instruct){
 
                 for(int j=0; j<8; ++j){
                     uint32_t lastBit = (bits>>j)&0x01;
+                    
                     F->draw(x+(8-j), y+i, (lastBit == 1) ? 0xFFFFFF : 0x0);
+                    
                 }
             }
             F->update();
@@ -639,6 +649,10 @@ void chip8::decode(uint16_t _instruct){
                 printf("t[0] %d\n", s[0]-'0');
                 printf("t[1] %d\n", s[1]-'0');
                 printf("t[2] %d\n", s[2]-'0');
+
+                ram[I+2] = s[2]-'0';
+                ram[I+1] = s[1]-'0';
+                ram[I] = s[0]-'0';
             }
             break;
 
