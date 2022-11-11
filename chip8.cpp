@@ -190,7 +190,6 @@ void chip8::decode(uint16_t _instruct){
     case 0x00EE:
         PC = stack.top();
         stack.pop();
-        
         break;
     // 1NNN (jump)
     case 0x1000 ... 0x1FFF:
@@ -214,7 +213,7 @@ void chip8::decode(uint16_t _instruct){
         }
         break;
     // 5XY0 Skip if VX equal VY
-    case 0x5000 ... 0x5FF0:
+    case 0x5000 ... 0x5FFF:
         if(V[X] == V[Y]){
             PC += 2;
         }
@@ -232,7 +231,6 @@ void chip8::decode(uint16_t _instruct){
     // 8??? Logical and arithmetic instructions
     case 0x8000 ... 0x8FFF:
         {
-
             uint8_t type = _instruct&0x000F;
 
             switch (type)
@@ -286,7 +284,7 @@ void chip8::decode(uint16_t _instruct){
         break;
 
     // 9XY0 Skip if VX not equal VY
-    case 0x9000 ... 0x9FF0:
+    case 0x9000 ... 0x9FFF:
         if(V[X] != V[Y]){
             PC += 2;
         }
@@ -676,15 +674,16 @@ void chip8::decode(uint16_t _instruct){
             break;
 
         default:
-            printf("UNKNOWN INSTRUCTION %04X\n", _instruct);
             break;
         }
         break;
 
 
     default:
+        printf("UNKNOWN INSTRUCTION %04X\n", _instruct);
         break;
     }
+
 }
 
 /**

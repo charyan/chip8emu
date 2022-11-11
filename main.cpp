@@ -9,12 +9,6 @@
 #include <SDL2/SDL.h>
 #include <stdio.h>
 #include <stdbool.h>
-// #include <string>
-
-/**
- * @todo soundTimer ?
- *       delayTimer ?
- */
 
 const int C8_WIDTH = 64;
 const int C8_HEIGHT = 32;
@@ -62,7 +56,6 @@ int main(int argc, char* args[])
             if(e.type==SDL_KEYDOWN && e.key.keysym.sym == SDLK_SPACE){
                 pause = !pause;
             }
-
         }
         
         if(!pause){
