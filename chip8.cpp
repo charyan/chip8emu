@@ -660,6 +660,7 @@ void chip8::decode(uint16_t _instruct){
             for(int i=0; i<=X; ++i){
                 ram[I+i] = V[i];
             }
+            I = I+X+1;
             break;
 
         // FX65 Load from memory
@@ -671,6 +672,7 @@ void chip8::decode(uint16_t _instruct){
                     V[i] = ram[I+i];
                 }
             }
+            I = I+X+1;
             break;
 
         default:
