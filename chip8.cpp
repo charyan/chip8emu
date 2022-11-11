@@ -362,7 +362,7 @@ void chip8::decode(uint16_t _instruct){
                         if(e.key.keysym.sym == SDLK_x){
                             PC += 2;
                         }
-                        
+                        break;
                     case 0x01:
                         if(e.key.keysym.sym == SDLK_1){
                             PC += 2;
@@ -452,7 +452,7 @@ void chip8::decode(uint16_t _instruct){
                         if(e.key.keysym.sym == SDLK_x){
                             PC += 2;
                         }
-                        
+                        break;
                     case 0x01:
                         if(e.key.keysym.sym == SDLK_1){
                             PC += 2;

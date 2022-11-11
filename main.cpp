@@ -1,3 +1,6 @@
+
+#define IS_DEBUG_MODE_ON true
+
 #include <iostream>
 
 #include "headers/chip8.h"
@@ -6,6 +9,7 @@
 #include <SDL2/SDL.h>
 #include <stdio.h>
 #include <stdbool.h>
+// #include <string>
 
 /**
  * @todo soundTimer ?
@@ -20,20 +24,32 @@ const int WINDOW_HEIGHT = 600;
 
 int main(int argc, char* args[])
 {
-    frontend fr = frontend("chip8emu", WINDOW_WIDTH, WINDOW_HEIGHT, C8_WIDTH, C8_HEIGHT, true);
+    frontend fr = frontend("chip8emu", WINDOW_WIDTH, WINDOW_HEIGHT, C8_WIDTH, C8_HEIGHT, IS_DEBUG_MODE_ON);
 	chip8 c = chip8(&fr);
     
     fr.setColor(0);
    
     fr.update();
-    c.load("octojam2title.ch8");
+
+    if(argc==2){
+        c.load(args[1]);
+    } else {
+        if(IS_DEBUG_MODE_ON){
+            c.load("danm8ku.ch8");
+        } else {
+            std::cerr << "Usage: " << args[0] << " ROM" << std::endl;
+        }
+    }
+
 
     SDL_Event e;
-    uint64_t tickTime = 0;
+
+    uint64_t tickTimer = 0;
+    
     uint64_t lastTime = 1000;
 
-    // Time used for timers in ms
-    uint64_t timerTime = 0;
+    // Used for delayTimer and soundTimer
+    uint64_t timerTimer = 0;
 
     bool pause = false;
 
@@ -50,14 +66,14 @@ int main(int argc, char* args[])
         }
         
         if(!pause){
-            if(lastTime-timerTime >= (1000/60)){
+            if(lastTime-timerTimer >= (1000/60)){
                 c.timerTick();
-                timerTime = lastTime;
+                timerTimer = lastTime;
             }
 
-            if(lastTime-tickTime >= 1){
+            if(lastTime-tickTimer >= 0){
                 c.tick();
-                tickTime = lastTime;
+                tickTimer = lastTime;
             }
             
             lastTime = SDL_GetTicks64();
