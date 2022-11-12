@@ -1,3 +1,6 @@
+
+#define IS_DEBUG_MODE_ON true
+
 #include <iostream>
 
 #include "headers/chip8.h"
@@ -7,11 +10,6 @@
 #include <stdio.h>
 #include <stdbool.h>
 
-/**
- * @todo soundTimer ?
- *       delayTimer ?
- */
-
 const int C8_WIDTH = 64;
 const int C8_HEIGHT = 32;
 
@@ -20,17 +18,32 @@ const int WINDOW_HEIGHT = 600;
 
 int main(int argc, char* args[])
 {
-    frontend fr = frontend("chip8emu", WINDOW_WIDTH, WINDOW_HEIGHT, C8_WIDTH, C8_HEIGHT, true);
+    frontend fr = frontend("chip8emu", WINDOW_WIDTH, WINDOW_HEIGHT, C8_WIDTH, C8_HEIGHT, IS_DEBUG_MODE_ON);
 	chip8 c = chip8(&fr);
     
     fr.setColor(0);
    
     fr.update();
-    c.load("danm8ku.ch8");
+
+    if(argc==2){
+        c.load(args[1]);
+    } else {
+        if(IS_DEBUG_MODE_ON){
+            c.load("danm8ku.ch8");
+        } else {
+            std::cerr << "Usage: " << args[0] << " ROM" << std::endl;
+        }
+    }
+
 
     SDL_Event e;
-    uint64_t t0 = 0;
-    uint64_t t1 = 1000;
+
+    uint64_t tickTimer = 0;
+    
+    uint64_t lastTime = 1000;
+
+    // Used for delayTimer and soundTimer
+    uint64_t timerTimer = 0;
 
     bool pause = false;
 
@@ -43,16 +56,20 @@ int main(int argc, char* args[])
             if(e.type==SDL_KEYDOWN && e.key.keysym.sym == SDLK_SPACE){
                 pause = !pause;
             }
-
         }
         
         if(!pause){
-            if(t1-t0 >= 10){
+            if(lastTime-timerTimer >= (1000/60)){
+                c.timerTick();
+                timerTimer = lastTime;
+            }
+
+            if(lastTime-tickTimer >= 0){
                 c.tick();
-                t0 = t1;
+                tickTimer = lastTime;
             }
             
-            t1 = SDL_GetTicks64();
+            lastTime = SDL_GetTicks64();
         }
     }
 
