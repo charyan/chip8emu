@@ -7,8 +7,7 @@
 #include "headers/frontend.h"
 
 #include <SDL2/SDL.h>
-#include <stdio.h>
-#include <stdbool.h>
+#include <cstdio>
 
 const int C8_WIDTH = 64;
 const int C8_HEIGHT = 32;
@@ -18,11 +17,13 @@ const int WINDOW_HEIGHT = 600;
 
 int main(int argc, char* args[])
 {
+    srand(time(0)); // Initialize random once for whole program execution
+
     frontend fr = frontend("chip8emu", WINDOW_WIDTH, WINDOW_HEIGHT, C8_WIDTH, C8_HEIGHT, IS_DEBUG_MODE_ON);
 	chip8 c = chip8(&fr);
     
     fr.setColor(0);
-   
+
     fr.update();
 
     if(argc==2){
