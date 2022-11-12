@@ -3,8 +3,6 @@
 #include <cstdlib>
 #include <ctime>
 
-
-
 chip8::chip8(frontend* _F)
 {
     F = _F;
@@ -153,7 +151,7 @@ std::string chip8::getDebugText(){
  */
 uint16_t chip8::fetch(){
     uint16_t ins = ram[PC];
-    ins = ins << 8;
+    ins = (ins << 8);
     ins = ins | ram[PC+1];
     PC += 2;
     return ins;
@@ -253,28 +251,28 @@ void chip8::decode(uint16_t _instruct){
                 break;
             // 8XY4 Add
             case 0x4:
-                V[X] += V[Y];
                 V[0x0F] = (V[X]+V[Y]>255) ? 1 : 0;
+                V[X] += V[Y];
                 break;
             // 8XY5 Substract VX-VY
             case 0x5:
+                V[0x0F] = (V[X]-V[Y] < 0) ? 0 : 1;
                 V[X] = V[X] - V[Y];
                 break;
             // 8XY6 Shift right
             case 0x6:
-                V[X] = V[Y];
                 V[0x0F] = V[X] & 0x1;
-                V[X] = V[X] >> 1;
+                V[X] >>= 1;
                 break;
             // 8XY7 Substract
             case 0x7:
+                V[0x0F] = (V[Y]-V[X] < 0) ? 0 : 1;
                 V[X] = V[Y] - V[X];
                 break;
             // 8XYE Shift left
             case 0xE:
-                V[X] = V[Y];
                 V[0x0F] = (V[X] & 0b10000000)>>7;
-                V[X] = V[X] << 1;
+                V[X] <<= 1;
                 break;
             
             default:
@@ -302,7 +300,6 @@ void chip8::decode(uint16_t _instruct){
     // CXNN Random
     case 0xC000 ... 0xCFFF:
         {
-            std::srand(std::time(nullptr));
             int random = std::rand();
             V[X] = NN & random;
         }
@@ -560,9 +557,6 @@ void chip8::decode(uint16_t _instruct){
         // FX1E Add to index
         case 0x1E:
             I += V[X];
-            if(I > 0xFFF){
-                V[0xF] = 1;
-            }
             break;
 
         // FX0A Get key
@@ -643,6 +637,10 @@ void chip8::decode(uint16_t _instruct){
                 std::string s = std::to_string(V[X]);
                 while(s.length()<3){s="0"+s;}
 
+                ram[I + 0] = s[0] - '0';
+                ram[I + 1] = s[1] - '0';
+                ram[I + 2] = s[2] - '0';
+
                 std::cout << std::to_string(V[X]) << std::endl;
                 printf("t[0] %d\n", s[0]-'0');
                 printf("t[1] %d\n", s[1]-'0');
@@ -660,19 +658,19 @@ void chip8::decode(uint16_t _instruct){
             for(int i=0; i<=X; ++i){
                 ram[I+i] = V[i];
             }
-            I = I+X+1;
+            
+            I = I + X + 1; // Not done on super chip 8
+
             break;
 
         // FX65 Load from memory
         case 0x65:
-            if(V[X]==0){
-                V[0] = ram[I];
-            } else {
-                for(int i=0; i<X; ++i){
-                    V[i] = ram[I+i];
-                }
+            for(int i=0; i<=X; ++i){
+                V[i] = ram[I+i];
             }
-            I = I+X+1;
+
+            I = I + X + 1; // Not done on super chip 8
+
             break;
 
         default:
