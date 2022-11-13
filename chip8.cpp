@@ -221,7 +221,7 @@ void chip8::decode(uint16_t _instruct){
                 break;
             // 8XY5 Substract VX-VY
             case 0x5:
-                V[0x0F] = (V[X]-V[Y] < 0) ? 0 : 1;
+                V[0x0F] = (V[X]>V[Y]) ? 1 : 0;
                 V[X] = V[X] - V[Y];
                 break;
             // 8XY6 Shift right
@@ -231,12 +231,12 @@ void chip8::decode(uint16_t _instruct){
                 break;
             // 8XY7 Substract
             case 0x7:
-                V[0x0F] = (V[Y]-V[X] < 0) ? 0 : 1;
+                V[0x0F] = (V[Y]>V[X]) ? 1 : 0;
                 V[X] = V[Y] - V[X];
                 break;
             // 8XYE Shift left
             case 0xE:
-                V[0x0F] = (V[X] & 0b10000000)>>7;
+                V[0x0F] = V[X]>>7;
                 V[X] <<= 1;
                 break;
             
@@ -265,7 +265,7 @@ void chip8::decode(uint16_t _instruct){
     // CXNN Random
     case 0xC000 ... 0xCFFF:
         {
-            int random = std::rand();
+            uint8_t random = std::rand()%256;
             V[X] = NN & random;
         }
         break;
