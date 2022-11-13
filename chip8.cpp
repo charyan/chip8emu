@@ -1,7 +1,5 @@
 #include "headers/chip8.h"
 #include <fstream>
-#include <cstdlib>
-#include <ctime>
 
 chip8::chip8(frontend* _F)
 {
@@ -179,7 +177,7 @@ void chip8::decode(uint16_t _instruct){
     {
     // 00E0 (clear screen)
     case 0x00E0:
-        for(int i=0; i<(int)(displayH*displayW); ++i){
+        for(int i=0; i < displayH * displayW; ++i){
             display[i] = false;
         }
         F->setColor(0);
@@ -308,8 +306,8 @@ void chip8::decode(uint16_t _instruct){
     // DXYN (display/draw)
     case 0xD000 ... 0XDFFF:
         {
-            int x = V[X]%64;
-            int y = V[Y]%32;
+            int x = V[X];
+            int y = V[Y];
             V[0x0F] = 0;
 
             // For each row of the sprite
@@ -319,12 +317,24 @@ void chip8::decode(uint16_t _instruct){
                 // printf("%02X\n", bits);
 
                 for(int j=0; j<8; ++j){
-                    uint32_t lastBit = (bits>>j)&0x01;
-                    
-                    F->draw(x+(8-j), y+i, (lastBit == 1) ? 0xFFFFFF : 0x0);
-                    
+                    bool pixel = ((bits>>(7-j) & 0x01));
+
+                    int position = ((x + j) % displayW) + ((y + i) % displayH) * displayW;
+
+                    if(pixel && display[position]) {
+                        V[0x0F] = 1;
+                    }
+
+                    display[position] ^= pixel;
                 }
             }
+
+            for(int r_x = 0; r_x < displayW; r_x++) {
+                for(int r_y = 0; r_y < displayH; r_y++) {
+                    F->draw(r_x, r_y, display[r_x + r_y * displayW] ? 0XFFFFFF : 0x0);
+                }
+            }
+
             F->update();
         }
         break;
@@ -529,10 +539,6 @@ void chip8::decode(uint16_t _instruct){
 
                 }
             }
-
-            
-
-            
         }
         break;
 
@@ -627,28 +633,15 @@ void chip8::decode(uint16_t _instruct){
 
         // FX29 Font character
         case 0x29:
-            I = 0x00;
+            I = V[X] * 5;
             break;
 
         // FX33 Binary-coded decimal conversion
         case 0x33:
             {
-                
-                std::string s = std::to_string(V[X]);
-                while(s.length()<3){s="0"+s;}
-
-                ram[I + 0] = s[0] - '0';
-                ram[I + 1] = s[1] - '0';
-                ram[I + 2] = s[2] - '0';
-
-                std::cout << std::to_string(V[X]) << std::endl;
-                printf("t[0] %d\n", s[0]-'0');
-                printf("t[1] %d\n", s[1]-'0');
-                printf("t[2] %d\n", s[2]-'0');
-
-                ram[I+2] = s[2]-'0';
-                ram[I+1] = s[1]-'0';
-                ram[I] = s[0]-'0';
+                ram[I + 0] = V[X] / 100;
+                ram[I + 1] = (V[X] / 10) % 10;
+                ram[I + 2] = V[X] % 10;
             }
             break;
 
