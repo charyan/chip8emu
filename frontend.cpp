@@ -142,6 +142,7 @@ void frontend::drawMainMenuBar()
             }
             if (ImGui::MenuItem("Clear System"))
             {
+                chip8Window_isPaused = true;
                 clear();
                 app->ch->reset();
             }
@@ -230,6 +231,73 @@ void frontend::drawSystemWindow()
     ImGui::NewLine();
 
     ImGui::InputInt("Clock frequence (Hz)", &clockFreq);
+
+    ImGui::NewLine();
+
+    ImGui::Text("Keyboard input");
+    ImU32 keyDownColor = ImGui::GetColorU32({0xFF,0,0,0xFF});
+    ImU32 keyUpColor =   ImGui::GetColorU32({0,0,0,0});
+
+    if(ImGui::BeginTable("table3", 4, flags)){
+        
+        ImGui::TableNextRow();
+        ImGui::TableSetColumnIndex(0);
+        ImGui::Text("1");
+        ImGui::TableSetBgColor(ImGuiTableBgTarget_CellBg, ((app->ch->keyPressed_1)?keyDownColor:keyUpColor));
+        ImGui::TableSetColumnIndex(1);
+        ImGui::Text("2");
+        ImGui::TableSetBgColor(ImGuiTableBgTarget_CellBg, ((app->ch->keyPressed_2)?keyDownColor:keyUpColor));
+        ImGui::TableSetColumnIndex(2);
+        ImGui::Text("3");
+        ImGui::TableSetBgColor(ImGuiTableBgTarget_CellBg, ((app->ch->keyPressed_3)?keyDownColor:keyUpColor));
+        ImGui::TableSetColumnIndex(3);
+        ImGui::Text("c");
+        ImGui::TableSetBgColor(ImGuiTableBgTarget_CellBg, ((app->ch->keyPressed_c)?keyDownColor:keyUpColor));
+
+        ImGui::TableNextRow();
+        ImGui::TableSetColumnIndex(0);
+        ImGui::Text("4");
+        ImGui::TableSetBgColor(ImGuiTableBgTarget_CellBg, ((app->ch->keyPressed_4)?keyDownColor:keyUpColor));
+        ImGui::TableSetColumnIndex(1);
+        ImGui::Text("5");
+        ImGui::TableSetBgColor(ImGuiTableBgTarget_CellBg, ((app->ch->keyPressed_5)?keyDownColor:keyUpColor));
+        ImGui::TableSetColumnIndex(2);
+        ImGui::Text("6");
+        ImGui::TableSetBgColor(ImGuiTableBgTarget_CellBg, ((app->ch->keyPressed_6)?keyDownColor:keyUpColor));
+        ImGui::TableSetColumnIndex(3);
+        ImGui::Text("d");
+        ImGui::TableSetBgColor(ImGuiTableBgTarget_CellBg, ((app->ch->keyPressed_d)?keyDownColor:keyUpColor));
+
+        ImGui::TableNextRow();
+        ImGui::TableSetColumnIndex(0);
+        ImGui::Text("7");
+        ImGui::TableSetBgColor(ImGuiTableBgTarget_CellBg, ((app->ch->keyPressed_7)?keyDownColor:keyUpColor));
+        ImGui::TableSetColumnIndex(1);
+        ImGui::Text("8");
+        ImGui::TableSetBgColor(ImGuiTableBgTarget_CellBg, ((app->ch->keyPressed_8)?keyDownColor:keyUpColor));
+        ImGui::TableSetColumnIndex(2);
+        ImGui::Text("9");
+        ImGui::TableSetBgColor(ImGuiTableBgTarget_CellBg, ((app->ch->keyPressed_9)?keyDownColor:keyUpColor));
+        ImGui::TableSetColumnIndex(3);
+        ImGui::Text("e");
+        ImGui::TableSetBgColor(ImGuiTableBgTarget_CellBg, ((app->ch->keyPressed_e)?keyDownColor:keyUpColor));
+
+        ImGui::TableNextRow();
+        ImGui::TableSetColumnIndex(0);
+        ImGui::Text("a");
+        ImGui::TableSetBgColor(ImGuiTableBgTarget_CellBg, ((app->ch->keyPressed_a)?keyDownColor:keyUpColor));
+        ImGui::TableSetColumnIndex(1);
+        ImGui::Text("0");
+        ImGui::TableSetBgColor(ImGuiTableBgTarget_CellBg, ((app->ch->keyPressed_0)?keyDownColor:keyUpColor));
+        ImGui::TableSetColumnIndex(2);
+        ImGui::Text("b");
+        ImGui::TableSetBgColor(ImGuiTableBgTarget_CellBg, ((app->ch->keyPressed_b)?keyDownColor:keyUpColor));
+        ImGui::TableSetColumnIndex(3);
+        ImGui::Text("f");
+        ImGui::TableSetBgColor(ImGuiTableBgTarget_CellBg, ((app->ch->keyPressed_f)?keyDownColor:keyUpColor));
+
+        ImGui::EndTable();
+    }
 
 
     ImGui::NewLine();
@@ -358,6 +426,10 @@ void frontend::getRoms()
         roms.push_back(entry.path());
 }
 
+/**
+ * @brief Set all pixel data to 0
+ * 
+ */
 void frontend::clear()
 {
     for (int i = 0; i < bufferW * bufferH; ++i)
@@ -366,6 +438,10 @@ void frontend::clear()
     }
 }
 
+/**
+ * @brief Draw the memory editor window
+ * 
+ */
 void frontend::drawMemoryEditor()
 {
     static MemoryEditor mem_edit;

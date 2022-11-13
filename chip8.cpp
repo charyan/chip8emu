@@ -3,6 +3,23 @@
 
 chip8::chip8()
 {
+    keyPressed_0 = false;
+    keyPressed_1 = false;
+    keyPressed_2 = false;
+    keyPressed_3 = false;
+    keyPressed_4 = false;
+    keyPressed_5 = false;
+    keyPressed_6 = false;
+    keyPressed_7 = false;
+    keyPressed_8 = false;
+    keyPressed_9 = false;
+    keyPressed_a = false;
+    keyPressed_b = false;
+    keyPressed_c = false;
+    keyPressed_d = false;
+    keyPressed_e = false;
+    keyPressed_f = false;
+
     displayH = 32;
     displayW = 64;
 
@@ -312,184 +329,115 @@ void chip8::decode(uint16_t _instruct){
             
             if(NN == 0x9E){
                 // EX9E Skip if key down
-                if(e.type == SDL_KEYDOWN){    
-                    switch (V[X])
+                switch (V[X])
                     {
                     case 0x00:
-                        if(e.key.keysym.sym == SDLK_x){
-                            PC += 2;
-                        }
+                        if(keyPressed_0){PC += 2;}
                         break;
                     case 0x01:
-                        if(e.key.keysym.sym == SDLK_1){
-                            PC += 2;
-                        }
+                        if(keyPressed_1){PC += 2;}
                         break;
                     case 0x02:
-                        if(e.key.keysym.sym == SDLK_2){
-                            PC += 2;
-                        }
+                        if(keyPressed_2){PC += 2;}
                         break;
                     case 0x03:
-                        if(e.key.keysym.sym == SDLK_3){
-                            PC += 2;
-                        }
+                        if(keyPressed_3){PC += 2;}
                         break;
                     case 0x04:
-                        if(e.key.keysym.sym == SDLK_q){
-                            PC += 2;
-                        }
+                        if(keyPressed_4){PC += 2;}
                         break;
                     case 0x05:
-                        if(e.key.keysym.sym == SDLK_w){
-                            PC += 2;
-                        }
+                        if(keyPressed_5){PC += 2;}
                         break;
                     case 0x06:
-                        if(e.key.keysym.sym == SDLK_e){
-                            PC += 2;
-                        }
+                        if(keyPressed_6){PC += 2;}
                         break;
                     case 0x07:
-                        if(e.key.keysym.sym == SDLK_a){
-                            PC += 2;
-                        }
+                        if(keyPressed_7){PC += 2;}
                         break;
                     case 0x08:
-                        if(e.key.keysym.sym == SDLK_s){
-                            PC += 2;
-                        }
+                        if(keyPressed_8){PC += 2;}
                         break;
                     case 0x09:
-                        if(e.key.keysym.sym == SDLK_d){
-                            PC += 2;
-                        }
+                        if(keyPressed_9){PC += 2;}
                         break;
                     case 0x0a:
-                        if(e.key.keysym.sym == SDLK_z){
-                            PC += 2;
-                        }
+                        if(keyPressed_a){PC += 2;}
                         break;
                     case 0x0b:
-                        if(e.key.keysym.sym == SDLK_c){
-                            PC += 2;
-                        }
+                        if(keyPressed_b){PC += 2;}
                         break;
                     case 0x0c:
-                        if(e.key.keysym.sym == SDLK_4){
-                            PC += 2;
-                        }
+                        if(keyPressed_c){PC += 2;}
                         break;
                     case 0x0d:
-                        if(e.key.keysym.sym == SDLK_r){
-                            PC += 2;
-                        }
+                        if(keyPressed_d){PC += 2;}
                         break;
                     case 0x0e:
-                        if(e.key.keysym.sym == SDLK_f){
-                            PC += 2;
-                        }
+                        if(keyPressed_e){PC += 2;}
                         break;
                     case 0x0f:
-                        if(e.key.keysym.sym == SDLK_v){
-                            PC += 2;
-                        }
+                        if(keyPressed_f){PC += 2;}
                         break;
                     default:
                         break;
                     }
-                }
 
             } else if(NN == (uint8_t)0XA1){
                 // EXA1 Skip if key up
-                if(e.type == SDL_KEYUP){    
-                    switch (V[X])
+                switch (V[X])
                     {
                     case 0x00:
-                        if(e.key.keysym.sym == SDLK_x){
-                            PC += 2;
-                        }
+                        if(!keyPressed_0){PC += 2;}
                         break;
                     case 0x01:
-                        if(e.key.keysym.sym == SDLK_1){
-                            PC += 2;
-                        }
+                        if(!keyPressed_1){PC += 2;}
                         break;
                     case 0x02:
-                        if(e.key.keysym.sym == SDLK_2){
-                            PC += 2;
-                        }
+                        if(!keyPressed_2){PC += 2;}
                         break;
                     case 0x03:
-                        if(e.key.keysym.sym == SDLK_3){
-                            PC += 2;
-                        }
+                        if(!keyPressed_3){PC += 2;}
                         break;
                     case 0x04:
-                        if(e.key.keysym.sym == SDLK_q){
-                            PC += 2;
-                        }
+                        if(!keyPressed_4){PC += 2;}
                         break;
                     case 0x05:
-                        if(e.key.keysym.sym == SDLK_w){
-                            PC += 2;
-                        }
+                        if(!keyPressed_5){PC += 2;}
                         break;
                     case 0x06:
-                        if(e.key.keysym.sym == SDLK_e){
-                            PC += 2;
-                        }
+                        if(!keyPressed_6){PC += 2;}
                         break;
                     case 0x07:
-                        if(e.key.keysym.sym == SDLK_a){
-                            PC += 2;
-                        }
+                        if(!keyPressed_7){PC += 2;}
                         break;
                     case 0x08:
-                        if(e.key.keysym.sym == SDLK_s){
-                            PC += 2;
-                        }
+                        if(!keyPressed_8){PC += 2;}
                         break;
                     case 0x09:
-                        if(e.key.keysym.sym == SDLK_d){
-                            PC += 2;
-                        }
+                        if(!keyPressed_9){PC += 2;}
                         break;
                     case 0x0a:
-                        if(e.key.keysym.sym == SDLK_z){
-                            PC += 2;
-                        }
+                        if(!keyPressed_a){PC += 2;}
                         break;
                     case 0x0b:
-                        if(e.key.keysym.sym == SDLK_c){
-                            PC += 2;
-                        }
+                        if(!keyPressed_b){PC += 2;}
                         break;
                     case 0x0c:
-                        if(e.key.keysym.sym == SDLK_4){
-                            PC += 2;
-                        }
+                        if(!keyPressed_c){PC += 2;}
                         break;
                     case 0x0d:
-                        if(e.key.keysym.sym == SDLK_r){
-                            PC += 2;
-                        }
+                        if(!keyPressed_d){PC += 2;}
                         break;
                     case 0x0e:
-                        if(e.key.keysym.sym == SDLK_f){
-                            PC += 2;
-                        }
+                        if(!keyPressed_e){PC += 2;}
                         break;
                     case 0x0f:
-                        if(e.key.keysym.sym == SDLK_v){
-                            PC += 2;
-                        }
+                        if(!keyPressed_f){PC += 2;}
                         break;
                     default:
                         break;
                     }
-
-                }
             }
         }
         break;
@@ -520,66 +468,23 @@ void chip8::decode(uint16_t _instruct){
         // FX0A Get key
         case 0x0A:
             {
-                SDL_Event e;
-                SDL_PollEvent(&e);
-                if(e.type == SDL_KEYDOWN){
-                    switch (e.key.keysym.sym)
-                    {
-                    case SDLK_1:
-                        V[X] = 0x01;
-                        break;
-                    case SDLK_2:
-                        V[X] = 0x02;
-                        break;
-                    case SDLK_3:
-                        V[X] = 0x03;
-                        break;
-                    case SDLK_4:
-                        V[X] = 0x0C;
-                        break;
-                    case SDLK_q:
-                        V[X] = 0x04;
-                        break;
-                    case SDLK_w:
-                        V[X] = 0x05;
-                        break;
-                    case SDLK_e:
-                        V[X] = 0x06;
-                        break;
-                    case SDLK_r:
-                        V[X] = 0x0D;
-                        break;
-                    case SDLK_a:
-                        V[X] = 0x07;
-                        break;
-                    case SDLK_s:
-                        V[X] = 0x08;
-                        break;
-                    case SDLK_d:
-                        V[X] = 0x09;
-                        break;
-                    case SDLK_f:
-                        V[X] = 0x0E;
-                        break;
-                    case SDLK_v:
-                        V[X] = 0x0F;
-                        break;
-                    case SDLK_z:
-                        V[X] = 0x0A;
-                        break;
-                    case SDLK_x:
-                        V[X] = 0x00;
-                        break;
-                    case SDLK_c:
-                        V[X] = 0x0B;
-                        break;
-                    
-                    default:
-                        break;
-                    }
-                } else {
-                    PC -= 2;
-                }
+                if(keyPressed_0){V[X] = 0x00;}
+                else if(keyPressed_1){V[X] = 0x01;}
+                else if(keyPressed_2){V[X] = 0x02;}
+                else if(keyPressed_3){V[X] = 0x03;}
+                else if(keyPressed_4){V[X] = 0x04;}
+                else if(keyPressed_5){V[X] = 0x05;}
+                else if(keyPressed_6){V[X] = 0x06;}
+                else if(keyPressed_7){V[X] = 0x07;}
+                else if(keyPressed_8){V[X] = 0x08;}
+                else if(keyPressed_9){V[X] = 0x09;}
+                else if(keyPressed_a){V[X] = 0x0a;}
+                else if(keyPressed_b){V[X] = 0x0b;}
+                else if(keyPressed_c){V[X] = 0x0c;}
+                else if(keyPressed_d){V[X] = 0x0d;}
+                else if(keyPressed_e){V[X] = 0x0e;}
+                else if(keyPressed_f){V[X] = 0x0f;}
+                else {PC -= 2;}
             }
             break;
 

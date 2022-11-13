@@ -37,6 +37,23 @@ public:
     void timerTick();
     void load(std::string filename);
     void reset();
+
+    bool keyPressed_0;
+    bool keyPressed_1;
+    bool keyPressed_2;
+    bool keyPressed_3;
+    bool keyPressed_4;
+    bool keyPressed_5;
+    bool keyPressed_6;
+    bool keyPressed_7;
+    bool keyPressed_8;
+    bool keyPressed_9;
+    bool keyPressed_a;
+    bool keyPressed_b;
+    bool keyPressed_c;
+    bool keyPressed_d;
+    bool keyPressed_e;
+    bool keyPressed_f;
 };
 
 #endif // CHIP8_H
