@@ -1,17 +1,37 @@
 #include "headers/chip8.h"
 #include <fstream>
 
-chip8::chip8(frontend* _F)
+chip8::chip8()
 {
-    F = _F;
     displayH = 32;
     displayW = 64;
+
+    delayTimer = 0;
+    soundTimer = 0;
 
     ram = (uint8_t*) malloc(4096);
     display = (bool*) malloc(displayW*displayH);
     V = (uint8_t*) malloc(16);
+    
+    reset();
+}
+
+chip8::~chip8()
+{
+    free(ram);
+    free(display);
+    free(V);
+}
+
+/**
+ * @brief Reset PC, I, ram and display
+ * 
+ */
+void chip8::reset(){
     PC = 0x200;
     I = 0;
+
+    while(stack.size()>0){stack.pop();}
 
     for(int i=0; i<4096; ++i){ram[i] = 0;}
     for(int i=0; i<(int)(displayW*displayH); ++i){display[i] = 0;}
@@ -42,30 +62,11 @@ chip8::chip8(frontend* _F)
     }
 }
 
-chip8::~chip8()
-{
-    free(ram);
-    free(display);
-    free(V);
-}
-
 /**
  * @brief Get the instruction at PC and execute it
  */
 void chip8::tick(){
-    F->debug(getDebugText());  
-
     uint16_t ins = fetch();
-
-    if(lastTenInstructions.size()<10){
-        lastTenInstructions.push_back(ins);
-    } else {
-        for(int i=0; i<9;++i){
-            lastTenInstructions[i] = lastTenInstructions[i+1];
-        }
-        lastTenInstructions[9] = ins;
-    }
-
     decode(ins);
 }
 
@@ -90,57 +91,6 @@ std::string chip8::hexString(uint32_t n, uint32_t width){
     }
 
     return t;
-}
-
-
-
-/**
- * @brief Get debug text
- * 
- * @return std::string 
- */
-std::string chip8::getDebugText(){
-    std::string txt;
-    txt.append("\n");
-    txt.append("PC : 0x" + hexString(PC,3) + " || instruction : 0x" + hexString((ram[PC]<<8)|ram[PC+1], 4) + "\n");
-    txt.append("I  : 0x" + hexString(I,3) + "\n");
-    txt.append("\n");
-    txt.append("=================================================================================\n");
-    txt.append("| V0 | V1 | V2 | V3 | V4 | V5 | V6 | V7 | V8 | V9 | VA | VB | VC | VD | VE | VF |\n");
-    txt.append("| " + hexString(V[0]  ,2) + " | " + hexString(V[1]  ,2) + " | " + hexString(V[2],2)   + " | "
-                    + hexString(V[3]  ,2) + " | " + hexString(V[4]  ,2) + " | " + hexString(V[5],2)   + " | "
-                    + hexString(V[6]  ,2) + " | " + hexString(V[7]  ,2) + " | " + hexString(V[8],2)   + " | "
-                    + hexString(V[9]  ,2) + " | " + hexString(V[0xA],2) + " | " + hexString(V[0xB],2) + " | "
-                    + hexString(V[0xC],2) + " | " + hexString(V[0xD],2) + " | " + hexString(V[0xE],2) + " | "
-                    + hexString(V[0xF],2) + " |\n");
-    txt.append("=================================================================================\n");
-    txt.append("\n");
-    txt.append("Stack size : " + std::to_string(stack.size()) + " || Delay timer : " + std::to_string(delayTimer) + " || Sound timer : " + std::to_string(soundTimer) + "\n");
-
-    if(!stack.empty()){
-        txt.append("stack.top() : " + hexString(stack.top(), 3) + " || ram[stack.top()] : " + hexString((ram[stack.top()]<<8)|ram[stack.top()+1], 4) + "\n");
-    } else {
-        txt.append("\n");
-    }
-    txt.append("\n");
-    txt.append("\n");
-    txt.append("LAST INSTRUCTIONS: \n");
-
-    for(int i=0; i<(int)lastTenInstructions.size(); ++i){
-        txt.append(((i==0 && (int)lastTenInstructions.size()==10) ? "" : " ") +  std::to_string(lastTenInstructions.size()-i) + ". 0x" + hexString(lastTenInstructions[i], 4) + "\n");
-    }
-
-    for(int i=0; i<10-(int)lastTenInstructions.size(); ++i){
-        txt.append("\n");
-    }
-
-    txt.append("\n");
-    txt.append("\n");
-    txt.append("\n");
-    txt.append("\n");
-
-
-    return txt;
 }
 
 /**
@@ -180,7 +130,7 @@ void chip8::decode(uint16_t _instruct){
         for(int i=0; i < displayH * displayW; ++i){
             display[i] = false;
         }
-        F->setColor(0);
+        app->fr->setColor(0);
         break;
     // 00EE Return from subroutine
     case 0x00EE:
@@ -317,6 +267,7 @@ void chip8::decode(uint16_t _instruct){
                 // printf("%02X\n", bits);
 
                 for(int j=0; j<8; ++j){
+
                     bool pixel = ((bits>>(7-j) & 0x01));
 
                     int position = ((x + j) % displayW) + ((y + i) % displayH) * displayW;
@@ -331,11 +282,12 @@ void chip8::decode(uint16_t _instruct){
 
             for(int r_x = 0; r_x < displayW; r_x++) {
                 for(int r_y = 0; r_y < displayH; r_y++) {
-                    F->draw(r_x, r_y, display[r_x + r_y * displayW] ? 0XFFFFFF : 0x0);
+                    app->fr->draw(r_x, r_y, display[r_x + r_y * displayW] ? 0XFFFFFF : 0x0);
                 }
             }
 
-            F->update();
+           
+            app->fr->update();
         }
         break;
     
@@ -685,6 +637,9 @@ void chip8::decode(uint16_t _instruct){
  * @param filename 
  */
 void chip8::load(std::string filename){
+    reset();
+    
+    // Load file to ram
     std::ifstream File;
     File.open(filename);
 

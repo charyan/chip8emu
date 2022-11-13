@@ -3,3 +3,5 @@
 main
 .vscode/*
 *.txt
+imgui.ini
+main.old
