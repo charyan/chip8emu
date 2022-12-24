@@ -51,7 +51,7 @@ void chip8::reset(){
     while(stack.size()>0){stack.pop();}
 
     for(int i=0; i<4096; ++i){ram[i] = 0;}
-    for(int i=0; i<(int)(displayW*displayH); ++i){display[i] = 0;}
+    for(int i=0; i<(int)(displayW*displayH); ++i){display[i] = false;}
     for(int i=0; i<16; ++i){V[i] = 0;}
 
     uint8_t font[5*16] = {
@@ -204,15 +204,15 @@ void chip8::decode(uint16_t _instruct){
                 break;
             // 8XY1 Binary OR
             case 0x1:
-                V[X] = V[X] | V[Y];
+                V[X] |= V[Y];
                 break;
             // 8XY2 Binary AND
             case 0x2:
-                V[X] = V[X] & V[Y];
+                V[X] &= V[Y];
                 break;
             // 8XY3 Logical XOR
             case 0x3:
-                V[X] = V[X] ^ V[Y];
+                V[X] ^= V[Y];
                 break;
             // 8XY4 Add
             case 0x4:
@@ -221,26 +221,27 @@ void chip8::decode(uint16_t _instruct){
                 break;
             // 8XY5 Substract VX-VY
             case 0x5:
-                V[0x0F] = (V[X]>V[Y]) ? 1 : 0;
-                V[X] = V[X] - V[Y];
+                V[0x0F] = (V[Y]>V[X]) ? 0 : 1;
+                V[X] -= V[Y];
                 break;
             // 8XY6 Shift right
             case 0x6:
-                V[0x0F] = V[X] & 0x1;
-                V[X] >>= 1;
+                V[0x0F] = V[Y] & 0x1;
+                V[X] = V[Y] >> 1;
                 break;
             // 8XY7 Substract
             case 0x7:
-                V[0x0F] = (V[Y]>V[X]) ? 1 : 0;
+                V[0x0F] = (V[X]>V[Y]) ? 0 : 1;
                 V[X] = V[Y] - V[X];
                 break;
             // 8XYE Shift left
             case 0xE:
-                V[0x0F] = V[X]>>7;
-                V[X] <<= 1;
+                V[0x0F] = V[Y] >> 7;
+                V[X] = V[Y] << 1;
                 break;
             
             default:
+                printf("UNKNOWN INSTRUCTION %04X\n", _instruct);
                 break;
             }
         }
@@ -273,21 +274,27 @@ void chip8::decode(uint16_t _instruct){
     // DXYN (display/draw)
     case 0xD000 ... 0XDFFF:
         {
-            int x = V[X];
-            int y = V[Y];
+            int x = V[X] % displayW;
+            int y = V[Y] % displayH;
             V[0x0F] = 0;
 
             // For each row of the sprite
             for(int i=0; i<N; ++i){
+                if(y + i >= displayH) {
+                    continue; // Ignores pixels outside of screen
+                }
+                    
                 // For each bit of the Nth line of the sprite
                 uint8_t bits = ram[I+i];
-                // printf("%02X\n", bits);
 
                 for(int j=0; j<8; ++j){
+                    if(x+j >= displayW ) {
+                        continue;
+                    }
 
                     bool pixel = ((bits>>(7-j) & 0x01));
 
-                    int position = ((x + j) % displayW) + ((y + i) % displayH) * displayW;
+                    int position = (x + j) + (y + i) * displayW;
 
                     if(pixel && display[position]) {
                         V[0x0F] = 1;
@@ -383,7 +390,7 @@ void chip8::decode(uint16_t _instruct){
                         break;
                     }
 
-            } else if(NN == (uint8_t)0XA1){
+            } else if(NN == 0xA1){
                 // EXA1 Skip if key up
                 switch (V[X])
                     {
@@ -524,6 +531,7 @@ void chip8::decode(uint16_t _instruct){
             break;
 
         default:
+            printf("UNKNOWN INSTRUCTION %04X\n", _instruct);
             break;
         }
         break;
@@ -548,7 +556,7 @@ void chip8::load(std::string filename){
     std::ifstream File;
     File.open(filename);
 
-    for(int i=0;;++i){
+    for(int i=0;i + 0x200 < 4096;++i){
         int byte = File.get();
         if(byte == -1) break;
         // printf("%02X ", byte);
